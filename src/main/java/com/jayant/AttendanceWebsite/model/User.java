@@ -14,6 +14,15 @@ public class User {
     private String password;
     private String role; // "ADMIN", "STUDENT", "TEACHER"
 
+    public User() {
+        // Default constructor
+    }
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
     // Getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
