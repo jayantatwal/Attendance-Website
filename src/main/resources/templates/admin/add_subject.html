@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Subject</title>
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="dashboard">
+  <h1>Add New Subject</h1>
+
+  <form th:action="@{/admin/save-subject}" method="post">
+    <div class="section">
+      <label for="name">Subject Name:</label><br>
+      <input type="text" id="name" name="name" required>
+    </div>
+
+    <div class="section">
+      <button type="submit">Save Subject</button>
+      <button type="button" onclick="window.location.href='/admin/dashboard'">Cancel</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>

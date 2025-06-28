@@ -1,10 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
-<h1>This is Admin Dashboard</h1>
+<div class="dashboard">
+    <h1>Admin Dashboard</h1>
+
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" style="color: green; margin-bottom: 15px;">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <div th:if="${errorMessage}" style="color: red; margin-bottom: 15px;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Student Management -->
+    <div class="section">
+        <h2>Student Management</h2>
+        <button onclick="addStudent()">Add Student</button>
+        <button onclick="deleteStudent()">Delete Student</button>
+    </div>
+
+    <!-- Teacher Management -->
+    <div class="section">
+        <h2>Teacher Management</h2>
+        <button onclick="addTeacher()">Add Teacher</button>
+        <button onclick="deleteTeacher()">Delete Teacher</button>
+    </div>
+
+    <!-- Class & Subject Management -->
+    <div class="section">
+        <h2>Class & Subject Management</h2>
+        <button onclick="addClass()">Add Class</button>
+        <button onclick="addSubject()">Add Subject</button>
+    </div>
+
+    <!-- Timetable Management -->
+    <div class="section">
+        <h2>Timetable Management</h2>
+        <button onclick="addTimetable()">Add Timetable</button>
+        <button onclick="updateTimetable()">Update Timetable</button>
+    </div>
+
+    <!-- Logout -->
+    <div class="section">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<script th:src="@{/js/admin.js}"></script>
 </body>
 </html>

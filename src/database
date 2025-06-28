@@ -1,0 +1,101 @@
+Attendance Management System – Database Tables Description
+----------------------------------------------------------
+
+1. users
+- Stores all system users (students, teachers, admins)
+
+Columns:
+- id           : Primary key (auto-incremented)
+- email        : Unique email used for login
+- password     : Hashed password
+- role         : User role ('STUDENT', 'TEACHER', 'ADMIN')
+- status       : 'PENDING' (default) or 'ACTIVE'
+- created_at   : Timestamp when user was created
+
+----------------------------------------------------------
+
+2. student_profile
+- Stores additional details for students
+
+Columns:
+- id           : Foreign key to users(id)
+- class_id     : Foreign key to classes(id)
+- full_name    : Full name of the student
+- roll_number  : Student's roll number
+- phone        : Contact number
+
+----------------------------------------------------------
+
+3. teacher_profile
+- Stores additional details for teachers
+
+Columns:
+- id           : Foreign key to users(id)
+- full_name    : Full name of the teacher
+- designation  : e.g., Assistant Professor
+- department   : Department name (e.g., CS)
+
+----------------------------------------------------------
+
+4. classes
+- Stores class groups like MCA Morning, MSC CS, etc.
+
+Columns:
+- id           : Primary key
+- name         : Class name (must be unique)
+
+----------------------------------------------------------
+
+5. subjects
+- Stores subject names
+
+Columns:
+- id           : Primary key
+- name         : Subject name
+
+----------------------------------------------------------
+
+6. students_classes
+- Maps students to classes (many-to-one)
+
+Columns:
+- student_id   : Foreign key to users(id)
+- class_id     : Foreign key to classes(id)
+- (Primary key is combination of student_id and class_id)
+
+----------------------------------------------------------
+
+7. timetable
+- Stores the class schedule (subject, teacher, class, time)
+
+Columns:
+- id           : Primary key
+- class_id     : Foreign key to classes(id)
+- subject_id   : Foreign key to subjects(id)
+- teacher_id   : Foreign key to users(id), where role = 'TEACHER'
+- day_of_week  : e.g., Monday, Tuesday, etc.
+- start_time   : Start time of class
+- end_time     : End time of class
+
+----------------------------------------------------------
+
+8. attendance
+- Stores attendance records for students
+
+Columns:
+- id           : Primary key
+- student_id   : Foreign key to users(id)
+- subject_id   : Foreign key to subjects(id)
+- class_id     : Foreign key to classes(id)
+- date         : Date of class
+- status       : 'PRESENT' or 'ABSENT'
+- Unique constraint: (student_id, subject_id, date)
+
+----------------------------------------------------------
+
+Relationships Summary:
+- One user (student) → one student_profile
+- One user (teacher) → one teacher_profile
+- Each student is mapped to one class (students_classes)
+- Timetable links class + subject + teacher + time
+- Attendance links student + subject + class + date

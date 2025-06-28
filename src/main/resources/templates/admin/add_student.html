@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Student</title>
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="form-container">
+  <h2>Add Student</h2>
+
+  <form method="post" th:action="@{/admin/add-student}">
+    <label for="email">Student Email:</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="classId">Class:</label>
+    <select id="classId" name="classId" required>
+      <option value="">-- Select Class --</option>
+      <th:block th:each="cls : ${classes}">
+        <option th:value="${cls.id}" th:text="${cls.name}"></option>
+      </th:block>
+    </select>
+
+    <button type="submit">Add Student</button>
+  </form>
+
+  <br>
+  <a href="/admin/dashboard">← Back to Dashboard</a>
+</div>
+</body>
+</html>
