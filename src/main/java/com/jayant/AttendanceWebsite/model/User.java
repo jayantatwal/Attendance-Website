@@ -1,26 +1,34 @@
 package com.jayant.AttendanceWebsite.model;
 
 import jakarta.persistence.*;
-//This User class is a JPA entity that maps to a users table in your SQL database, storing user login info like email, password, and role.
+
 @Entity
-@Table(name = "users") // optional, just for naming
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Tells Spring to let the database auto-generate the ID.
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String email;
+
     private String password;
+
     private String role; // "ADMIN", "STUDENT", "TEACHER"
 
-    public User() {
-        // Default constructor
-    }
-    public User(String email, String password, String role) {
+    @Column(name = "class_name") // Optional: specify column name
+    private String className;    // e.g., "MCA Morning"
+
+    private String status;       // e.g., "PENDING" or "ACTIVE"
+
+    public User() {}
+
+    public User(String email, String password, String role, String className, String status) {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.className = className;
+        this.status = status;
     }
 
     // Getters & setters
@@ -35,4 +43,10 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getClassName() { return className; }
+    public void setClassName(String className) { this.className = className; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

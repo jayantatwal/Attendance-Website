@@ -1,16 +1,25 @@
 package com.jayant.AttendanceWebsite.controller;
 
+import com.jayant.AttendanceWebsite.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeController {
-    @GetMapping("/login") //Tells if we are on the entry point of the website it will open this
-    public String index(){
-        return "login"; // Will look for templates/index.html
+
+    @GetMapping("/login")
+    public String index() {
+        return "login"; // Renders templates/login.html
     }
+
+    @GetMapping("/signup")
+    public String signup(Model model) {
+        model.addAttribute("user", new User()); // Binds empty user to the form
+        return "signup"; // Renders templates/signup.html
+    }
+
     @GetMapping("/dashboard")
     public String showDashboard(Authentication authentication) {
         String role = authentication.getAuthorities().iterator().next().getAuthority();
@@ -22,7 +31,7 @@ public class HomeController {
         } else if (role.equals("ROLE_STUDENT")) {
             return "student/dashboard";
         } else {
-            return "error"; // fallback if role is unknown
+            return "error"; // fallback
         }
     }
 }

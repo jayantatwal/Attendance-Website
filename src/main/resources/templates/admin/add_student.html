@@ -9,18 +9,21 @@
 <div class="form-container">
   <h2>Add Student</h2>
 
-  <form method="post" th:action="@{/admin/add-student}">
-    <label for="email">Student Email:</label>
-    <input type="email" id="email" name="email" required />
+  <!-- Assuming you're binding a 'user' object -->
+  <form method="post" th:action="@{/admin/add-student}" th:object="${student}">
 
+    <!-- Email Field -->
+    <label for="email">Student Email:</label>
+    <input type="email" id="email" th:field="*{email}" required />
+
+    <!-- Class Dropdown -->
     <label for="classId">Class:</label>
-    <select id="classId" name="classId" required>
+    <select id="classId" th:field="*{className}" required>
       <option value="">-- Select Class --</option>
-      <th:block th:each="cls : ${classes}">
-        <option th:value="${cls.id}" th:text="${cls.name}"></option>
-      </th:block>
+      <option th:each="cls : ${classes}" th:value="${cls.name}" th:text="${cls.name}"></option>
     </select>
 
+    <!-- Submit Button -->
     <button type="submit">Add Student</button>
   </form>
 

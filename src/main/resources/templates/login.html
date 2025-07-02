@@ -13,16 +13,20 @@
             height: 100vh;
             margin: 0;
         }
+
         .login-container {
             background-color: white;
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
         }
+
         h2 {
             margin-bottom: 20px;
             text-align: center;
         }
+
         input[type="text"],
         input[type="password"] {
             width: 100%;
@@ -33,6 +37,7 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         button {
             width: 100%;
             background-color: #4CAF50;
@@ -43,8 +48,23 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #45a049;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -60,6 +80,11 @@
 
         <button type="submit">Login</button>
     </form>
+
+    <!-- 👇 Signup Link Section -->
+    <div class="signup-link">
+        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    </div>
 </div>
 </body>
 </html>

@@ -1,8 +1,13 @@
 package com.jayant.AttendanceWebsite.controller;
 
 import com.jayant.AttendanceWebsite.model.ClassEntity;
+import com.jayant.AttendanceWebsite.model.StudentProfile;
 import com.jayant.AttendanceWebsite.model.Subject;
+import com.jayant.AttendanceWebsite.model.User;
 import com.jayant.AttendanceWebsite.repository.ClassRepository;
+import com.jayant.AttendanceWebsite.repository.StudentProfileRepository;
+import com.jayant.AttendanceWebsite.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,12 +15,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
     private ClassRepository classRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private StudentProfileRepository studentProfileRepository;
 
     // Dashboard
     @GetMapping("/dashboard")
@@ -23,10 +35,36 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    // Student
     @GetMapping("/add-student")
     public String showAddStudentForm(Model model) {
+        model.addAttribute("student", new User()); // assuming you're using User model for student
+        model.addAttribute("classes", classRepository.findAll()); // fetch list of classes
         return "admin/add_student";
+    }
+    @PostMapping("/add-student")
+    public String addStudent(@ModelAttribute("user") User user) {
+        user.setRole("STUDENT");
+        user.setPassword(""); // leave password empty so user can sign up later
+        user.setStatus("PENDING"); // optional tracking status
+
+        // Save to users table
+        userRepository.save(user);
+
+        // Lookup classId from class name
+        Optional<ClassEntity> classEntityOpt = classRepository.findByName(user.getClassName());
+
+        if (classEntityOpt.isPresent()) {
+            ClassEntity classEntity = classEntityOpt.get();
+
+            // Save to student_profile table
+            StudentProfile studentProfile = new StudentProfile();
+            studentProfile.setEmail(user.getEmail());
+            studentProfile.setClassId(classEntity.getId());
+
+            studentProfileRepository.save(studentProfile);
+        }
+
+        return "redirect:/admin/dashboard";
     }
 
     // Teacher
@@ -71,5 +109,30 @@ public class AdminController {
     public String showAddSubjectForm(Model model) {
         model.addAttribute("subject", new Subject());
         return "admin/add_subject";
+    }
+    @GetMapping("/delete-student")
+    public String showDeleteStudentForm(Model model) {
+        return "admin/delete_student"; // assuming this is your HTML page
+    }
+
+    @Transactional
+    @PostMapping("/delete-student")
+    public String deleteStudent(@RequestParam String email, Model model) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent() && "STUDENT".equalsIgnoreCase(userOpt.get().getRole())) {
+            userRepository.deleteByEmail(email); // delete from users
+
+            // Try deleting from student_profile as well
+            studentProfileRepository.findByEmail(email).ifPresent(studentProfile -> {
+                studentProfileRepository.deleteByEmail(email);
+            });
+
+            model.addAttribute("success", "Student deleted successfully.");
+        } else {
+            model.addAttribute("error", "No student found with that email.");
+        }
+
+        return "admin/delete_student";
     }
 }
