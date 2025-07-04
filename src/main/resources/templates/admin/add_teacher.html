@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Teacher</title>
+  <link rel="stylesheet" th:href="@{/css/admin.css}" />
+</head>
+<body>
+<div class="form-container">
+  <h2>Add Teacher</h2>
+
+  <!-- Success/Error Messages -->
+  <div th:if="${successMessage}" style="color: green; margin-bottom: 10px;">
+    <p th:text="${successMessage}"></p>
+  </div>
+  <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;">
+    <p th:text="${errorMessage}"></p>
+  </div>
+
+  <form th:action="@{/admin/add-teacher}" th:object="${user}" method="post">
+    <!-- Email Field -->
+    <label for="email">Teacher Email:</label>
+    <input type="email" id="email" th:field="*{email}" required />
+
+    <!-- Subjects Dropdown -->
+    <label for="selectedSubjects">Select Subjects:</label>
+    <select id="selectedSubjects" name="selectedSubjects" multiple size="5" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px;">
+      <option th:each="subject : ${subjects}"
+              th:value="${subject.id}"
+              th:text="${subject.name}">
+      </option>
+    </select>
+
+    <!-- Submit -->
+    <button type="submit">Add Teacher</button>
+  </form>
+
+  <br>
+  <a href="/admin/dashboard">← Back to Dashboard</a>
+</div>
+</body>
+</html>

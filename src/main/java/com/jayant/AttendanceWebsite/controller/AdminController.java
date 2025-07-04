@@ -1,12 +1,7 @@
 package com.jayant.AttendanceWebsite.controller;
 
-import com.jayant.AttendanceWebsite.model.ClassEntity;
-import com.jayant.AttendanceWebsite.model.StudentProfile;
-import com.jayant.AttendanceWebsite.model.Subject;
-import com.jayant.AttendanceWebsite.model.User;
-import com.jayant.AttendanceWebsite.repository.ClassRepository;
-import com.jayant.AttendanceWebsite.repository.StudentProfileRepository;
-import com.jayant.AttendanceWebsite.repository.UserRepository;
+import com.jayant.AttendanceWebsite.model.*;
+import com.jayant.AttendanceWebsite.repository.*;
 import jakarta.transaction.Transactional;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +10,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,7 +25,13 @@ public class AdminController {
     private UserRepository userRepository;
 
     @Autowired
+    private TeacherProfileRepository teacherProfileRepository;
+
+    @Autowired
     private StudentProfileRepository studentProfileRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     // Dashboard
     @GetMapping("/dashboard")
@@ -67,11 +71,6 @@ public class AdminController {
         return "redirect:/admin/dashboard";
     }
 
-    // Teacher
-    @GetMapping("/add-teacher")
-    public String showAddTeacherForm() {
-        return "admin/add_teacher";
-    }
 
     // Timetable
     @GetMapping("/add-timetable")
@@ -110,6 +109,23 @@ public class AdminController {
         model.addAttribute("subject", new Subject());
         return "admin/add_subject";
     }
+    @PostMapping("/add-subject")
+    public String addSubject(@ModelAttribute Subject subject, RedirectAttributes redirectAttributes) {
+        String rawName = subject.getName().trim().replaceAll("\\s+", " ");
+        String formattedName = WordUtils.capitalizeFully(rawName);
+        subject.setName(formattedName);
+
+        try {
+            subjectRepository.save(subject);
+            redirectAttributes.addFlashAttribute("successMessage", "Subject added successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add subject.");
+        }
+
+        return "redirect:/admin/dashboard";
+    }
+
     @GetMapping("/delete-student")
     public String showDeleteStudentForm(Model model) {
         return "admin/delete_student"; // assuming this is your HTML page
@@ -135,4 +151,58 @@ public class AdminController {
 
         return "admin/delete_student";
     }
+
+    // Teacher
+    @GetMapping("/add-teacher")
+    public String showAddTeacherForm(Model model) {
+        model.addAttribute("user", new User()); // for the email input
+        model.addAttribute("subjects", subjectRepository.findAll()); // list of all subjects
+        return "admin/add_teacher"; // your Thymeleaf form page
+    }
+
+
+    @PostMapping("/add-teacher")
+    public String addTeacher(@ModelAttribute("user") User user,
+                             @RequestParam("selectedSubjects") List<Long> subjectIds,
+                             RedirectAttributes redirectAttributes) {
+
+        user.setRole("TEACHER");
+        user.setPassword(""); // or a default placeholder
+        userRepository.save(user);
+
+        TeacherProfile profile = new TeacherProfile();
+        profile.setEmail(user.getEmail());
+
+        Set<Subject> subjects = new HashSet<>(subjectRepository.findAllById(subjectIds));
+        profile.setSubjects(subjects);
+
+        teacherProfileRepository.save(profile);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Teacher added successfully.");
+        return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/delete-teacher")
+    public String showDeleteTeacherForm() {
+        return "admin/delete_teacher";
+    }
+
+    @PostMapping("/delete-teacher")
+    public String deleteTeacher(@RequestParam("email") String email, Model model) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent() && "TEACHER".equals(userOpt.get().getRole())) {
+            userRepository.delete(userOpt.get());
+
+            // Delete from teacher_profile if exists
+            teacherProfileRepository.findByEmail(email).ifPresent(teacherProfileRepository::delete);
+
+            model.addAttribute("success", "Teacher deleted successfully.");
+        } else {
+            model.addAttribute("error", "Teacher not found with given email.");
+        }
+
+        return "admin/delete_teacher";
+    }
+
 }

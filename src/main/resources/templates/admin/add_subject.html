@@ -9,10 +9,18 @@
 <div class="dashboard">
   <h1>Add New Subject</h1>
 
-  <form th:action="@{/admin/save-subject}" method="post">
+  <!-- Optional: show success or error messages -->
+  <div th:if="${successMessage}" style="color: green;">
+    <p th:text="${successMessage}"></p>
+  </div>
+  <div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+  </div>
+
+  <form th:action="@{/admin/add-subject}" th:object="${subject}" method="post">
     <div class="section">
       <label for="name">Subject Name:</label><br>
-      <input type="text" id="name" name="name" required>
+      <input type="text" th:field="*{name}" id="name" required>
     </div>
 
     <div class="section">
